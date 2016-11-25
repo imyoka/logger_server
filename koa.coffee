@@ -20,9 +20,8 @@ app.use koaBody({
             maxFieldsSize: '5mb'
     })
 
-app.use route.get '/'
-app.use route.get '/member_logger', routers.member_rough_logger
-app.use route.post '/member_logger', routers.member_detail_logger
+app.use route.get '/weblog/member_logger', routers.member_rough_logger
+app.use route.post '/weblog/member_logger', routers.member_detail_logger
 
 
 unless module.parent
