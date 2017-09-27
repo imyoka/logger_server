@@ -23,6 +23,8 @@ app.use koaBody({
 app.use route.get '/weblog/member_logger', routers.member_rough_logger
 app.use route.post '/weblog/member_logger', routers.member_detail_logger
 
+app.use route.get '/weblog/lecture_logger', routers.lecture_rough_logger
+
 
 unless module.parent
     app.listen 9999, -> console.log 'start koajs app on port: 9999'
