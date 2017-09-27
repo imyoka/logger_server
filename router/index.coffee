@@ -13,7 +13,7 @@ render= views(__dirname+ '/../views/', { ext: 'jade'})
 
 # rough logger
 # [format]
-# ?logname=[name]&uri=[uri]&params=[params]&page=[page]
+# ?logname=[name]&uri=[uri]&params=[params]
 member_rough_logger= ()->
     url= require 'url'
     { logname, uri, params }= url.parse(@req.url, true).query
@@ -36,9 +36,6 @@ member_rough_logger= ()->
     session.select(10)
     session.publish 'weblog', JSON.stringify(storeLogger)
     console.log 'member_rough_logger'
-    #console.log @req['headers']['x-real-ip'] || @req['headers']['x-forwarded-for']
-    #console.log @req['headers']['referer']
-    #console.log @req['headers']['user-agent']
 
     yield from DinsertMember [storeLogger]
     @body= 'success'
@@ -48,7 +45,7 @@ member_rough_logger= ()->
 # [format]
 # stringify
 # {
-#   name: [log name]
+#   logname: [log name]
 #   uri: [request uri]
 #   params: [request parameters]
 #   page: [current page]
@@ -57,7 +54,7 @@ member_rough_logger= ()->
 # }
 member_detail_logger= ->
     # 获取client传递过来的消息
-    { logname, uri, params, page, ua, ip } = @request.body
+    { logname, uri, params } = @request.body
     # filter
     unless logname? and uri? and page?
         @body= 'fail'
@@ -67,9 +64,9 @@ member_detail_logger= ->
         LOG_NAME: logname
         LOG_URI: uri
         LOG_PARAMS: params
-        LOG_PAGE: page
-        LOG_UA: ua
-        LOG_IP: ip
+        LOG_PAGE: @req['headers']['referer']
+        LOG_IP: @req['headers']['x-real-ip'] || @req['headers']['x-forwarded-for']
+        LOG_UA: @req['headers']['user-agent']
     storeLogger= Object.assign logData, {
         LOG_TYPE: 'DETAIL'
         LOG_TIME: "#{new Date().getTime()}"
