@@ -16,19 +16,22 @@ render= views(__dirname+ '/../views/', { ext: 'jade'})
 # ?logname=[name]&uri=[uri]&params=[params]
 member_rough_logger= ()->
     url= require 'url'
-    { logname, uri, params }= url.parse(@req.url, true).query
+    { logname, uri, params, logproj, loglevel, logres }= url.parse(@req.url, true).query
     # filter
     unless logname? and uri?
         @body= 'fail'
         yield return
 
     logData=
+        LOG_PROJ: logproj
         LOG_NAME: logname
         LOG_URI: uri
         LOG_PARAMS: params
+        LOG_RES: logres
         LOG_PAGE: @req['headers']['referer']
         LOG_IP: @req['headers']['x-real-ip'] || @req['headers']['x-forwarded-for']
         LOG_UA: @req['headers']['user-agent']
+        LOG_LEVEL: loglevel || 'debug'
     storeLogger= Object.assign logData, {
         LOG_TYPE: 'ROUGH'
         LOG_TIME: "#{new Date().getTime()}"
@@ -39,6 +42,12 @@ member_rough_logger= ()->
 
     yield from DinsertMember [storeLogger]
     @body= 'success'
+
+    loglevel ?= 'debug'
+    if logproj? and logname? and loglevel.toLowerCase() in ['debug', 'info', 'warn', 'error', 'fatal']
+        logger = $.initLogger logproj, logname, loglevel
+        logger[loglevel.toLowerCase()] JSON.stringify(storeLogger)
+
     yield return
 
 # detail logger

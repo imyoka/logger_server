@@ -1,3 +1,4 @@
+require('dotenv').config()
 co= require 'co'
 
 #====== interal modules =========

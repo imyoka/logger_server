@@ -1,3 +1,4 @@
+log4js = require 'log4js'
 #====== interal modules =========
 { serverinfo }= require('./database')
 
@@ -130,5 +131,14 @@ tools=
             EIN[ix]
         .join ''
         return "#{PreName}#{subfix}"
+    initLogger: (LOG_PROJ, LOG_NAME, LOG_LEVEL)->
+        options = {}
+        options['appenders'] = {
+            out: { type: 'stdout', layout: { type: 'colored' } }
+        };
+        options['appenders'][LOG_NAME] = { type: 'dateFile', filename: "logs/#{LOG_LEVEL}/#{LOG_PROJ}.log", pattern: '.yyyy-MM-dd', layout: { type: 'colored' } }
+        options['categories'] = { default: { appenders: [LOG_NAME, 'out'], level: LOG_LEVEL } }
+        log4js.configure options
+        return log4js.getLogger(LOG_NAME)
 
 module.exports= Object.create tools

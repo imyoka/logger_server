@@ -1,6 +1,9 @@
 redis= require 'redis'
 wrap= require 'co-redis'
 
-redisCo= wrap redis.createClient(16379, '10.171.131.37')
+rdhost = process.env.RDHOST
+rdport = process.env.RDPORT
+
+redisCo= wrap redis.createClient(rdport, rdhost)
 
 module.exports.session= redisCo
